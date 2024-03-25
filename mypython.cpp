@@ -1,18 +1,16 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
 #include <cctype>
+#include <fstream>
 
 enum TokenType {
     IDENTIFIER,
     KEYWORD,
     OPERATOR,
     LITERAL,
+    DELIMITER,
     COMMENT,
-    NEWLINE,
-    INDENT,
-    DEDENT,
     INVALID
 };
 
@@ -21,117 +19,123 @@ struct Token {
     std::string value;
 };
 
-class Lexer {
-private:
-    std::ifstream file;
-    char currentChar;
-    int indentLevel;
-    std::vector<std::string> keywords = {"if", "else", "while", "for", "def", "return"};
-    std::string operators = "+-*/%=(){}[]<>";
-    std::string literals = "0123456789";
-    std::string validIdentifierChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-    
-    char getNextChar() {
-        return file.get();
-    }
+bool isKeyword(const std::string& str) {
+    std::vector<std::string> keywords = {
+        "if", "else", "while", "for", "def", "return", "True", "False", "None"
+    };
+    return std::find(keywords.begin(), keywords.end(), str) != keywords.end();
+}
 
-    void skipWhitespace() {
-        while (isspace(currentChar) && currentChar != '\n') {
-            currentChar = getNextChar();
-        }
-    }
+bool isOperator(char c) {
+    std::string operators = "+-*/%=><&|^~";
+    return operators.find(c) != std::string::npos;
+}
 
-    Token getNextToken() {
-        Token token;
-        token.value = "";
+bool isDelimiter(char c) {
+    std::string delimiters = "()[]{},.:;";
+    return delimiters.find(c) != std::string::npos;
+}
 
-        if (currentChar == EOF) {
-            token.type = INVALID;
-            return token;
-        }
-
-        if (currentChar == '\n') {
-            token.type = NEWLINE;
-            token.value += currentChar;
-            currentChar = getNextChar();
-            return token;
-        }
-
-        if (isspace(currentChar)) {
-            skipWhitespace();
-            return getNextToken();
-        }
-
-        if (currentChar == '#') {
-            token.type = COMMENT;
-            while (currentChar != '\n' && currentChar != EOF) {
-                token.value += currentChar;
-                currentChar = getNextChar();
+bool isLiteral(const std::string& str) {
+    // Simplified check for literals (integers, floats, strings)
+    if (str.empty()) return false;
+    if (std::isdigit(str[0])) {
+        for (char c : str) {
+            if (!std::isdigit(c) && c != '.') {
+                return false;
             }
-            return token;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool isIdentifier(const std::string& str) {
+    if (str.empty()) return false;
+    if (!std::isalpha(str[0]) && str[0] != '_') return false;
+    for (char c : str) {
+        if (!std::isalnum(c) && c != '_') {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::vector<Token> tokenize(const std::string& code) {
+    std::vector<Token> tokens;
+    std::string currentToken;
+
+    for (size_t i = 0; i < code.size(); ++i) {
+        char c = code[i];
+        
+        // Skip whitespaces
+        if (std::isspace(c)) {
+            continue;
         }
 
-        if (std::find(operators.begin(), operators.end(), currentChar) != operators.end()) {
-            token.type = OPERATOR;
-            token.value += currentChar;
-            currentChar = getNextChar();
-            return token;
-        }
-
-        if (std::isdigit(currentChar)) {
-            token.type = LITERAL;
-            while (std::isdigit(currentChar) || currentChar == '.') {
-                token.value += currentChar;
-                currentChar = getNextChar();
+        // Check for comments
+        if (c == '#') {
+            while (i < code.size() && code[i] != '\n') {
+                ++i;
             }
-            return token;
+            tokens.push_back({COMMENT, ""});
+            continue;
         }
 
-        if (std::find(validIdentifierChars.begin(), validIdentifierChars.end(), currentChar) != validIdentifierChars.end()) {
-            while (std::find(validIdentifierChars.begin(), validIdentifierChars.end(), currentChar) != validIdentifierChars.end() ||
-                   std::isdigit(currentChar)) {
-                token.value += currentChar;
-                currentChar = getNextChar();
-            }
+        currentToken += c;
 
-            if (std::find(keywords.begin(), keywords.end(), token.value) != keywords.end()) {
-                token.type = KEYWORD;
-            } else {
-                token.type = IDENTIFIER;
+        if (isOperator(c) || isDelimiter(c)) {
+            if (!currentToken.empty()) {
+                TokenType type = isKeyword(currentToken) ? KEYWORD :
+                                 isLiteral(currentToken) ? LITERAL :
+                                 isIdentifier(currentToken) ? IDENTIFIER :
+                                 INVALID;
+                tokens.push_back({type, currentToken});
+                currentToken.clear();
             }
-
-            return token;
+            
+            if (isOperator(c)) {
+                tokens.push_back({OPERATOR, std::string(1, c)});
+            } else if (isDelimiter(c)) {
+                tokens.push_back({DELIMITER, std::string(1, c)});
+            }
+        } else if (i == code.size() - 1) {
+            TokenType type = isKeyword(currentToken) ? KEYWORD :
+                             isLiteral(currentToken) ? LITERAL :
+                             isIdentifier(currentToken) ? IDENTIFIER :
+                             INVALID;
+            tokens.push_back({type, currentToken});
         }
-
-        token.type = INVALID;
-        return token;
     }
 
-public:
-    Lexer(const std::string& filename) {
-        file.open(filename);
-        if (!file.is_open()) {
-            std::cerr << "Unable to open file\n";
-            exit(1);
+    return tokens;
+}
+
+void printTokens(const std::vector<Token>& tokens) {
+    for (const auto& token : tokens) {
+        std::cout << "Type: ";
+        switch (token.type) {
+            case IDENTIFIER: std::cout << "Identifier"; break;
+            case KEYWORD:    std::cout << "Keyword";    break;
+            case OPERATOR:   std::cout << "Operator";   break;
+            case LITERAL:    std::cout << "Literal";    break;
+            case DELIMITER:  std::cout << "Delimiter";  break;
+            case COMMENT:    std::cout << "Comment";    break;
+            case INVALID:    std::cout << "Invalid";    break;
         }
-        currentChar = getNextChar();
-        indentLevel = 0;
+        std::cout << ", Value: " << token.value << std::endl;
     }
+}
 
-    std::vector<Token> tokenize() {
-        std::vector<Token> tokens;
-        Token token;
-        token.value = "";
+int main() {
+    std::string code = "def add(a, b):\n    return a + b\nprint(add(5, 10))";
 
-        while (currentChar != EOF) {
-            token = getNextToken();
-            tokens.push_back(token);
-        }
+    std::vector<Token> tokens = tokenize(code);
+    printTokens(tokens);
 
-        file.close();
-        return tokens;
-    }
-};
+    return 0;
+}
+
 
 int main(){
   std::ifstream myfile;
