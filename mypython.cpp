@@ -151,3 +151,12 @@ int main(){
     std::cout << "Couldn't open file\n";
   }
 }
+
+/*int main() {
+    std::string code = "def add(a, b):\n    return a + b\nprint(add(5, 10))";
+
+    std::vector<Token> tokens = tokenize(code);
+    printTokens(tokens);
+
+    return 0;
+}*/
