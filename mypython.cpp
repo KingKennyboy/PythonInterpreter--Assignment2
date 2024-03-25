@@ -2,8 +2,10 @@
 #include <string>
 #include <vector>
 #include <cctype>
+#include <algorithm>
 #include <fstream>
 
+// Enumeration for token types
 enum TokenType {
     IDENTIFIER,
     KEYWORD,
@@ -14,11 +16,13 @@ enum TokenType {
     INVALID
 };
 
+// Structure to represent a token
 struct Token {
     TokenType type;
     std::string value;
 };
 
+// Check if the given string is a Python keyword
 bool isKeyword(const std::string& str) {
     std::vector<std::string> keywords = {
         "if", "else", "while", "for", "def", "return", "True", "False", "None"
@@ -26,18 +30,20 @@ bool isKeyword(const std::string& str) {
     return std::find(keywords.begin(), keywords.end(), str) != keywords.end();
 }
 
+// Check if the given character is a Python operator
 bool isOperator(char c) {
     std::string operators = "+-*/%=><&|^~";
     return operators.find(c) != std::string::npos;
 }
 
+// Check if the given character is a Python delimiter
 bool isDelimiter(char c) {
     std::string delimiters = "()[]{},.:;";
     return delimiters.find(c) != std::string::npos;
 }
 
+// Check if the given string is a Python literal (simplified)
 bool isLiteral(const std::string& str) {
-    // Simplified check for literals (integers, floats, strings)
     if (str.empty()) return false;
     if (std::isdigit(str[0])) {
         for (char c : str) {
@@ -50,6 +56,7 @@ bool isLiteral(const std::string& str) {
     return false;
 }
 
+// Check if the given string is a valid Python identifier
 bool isIdentifier(const std::string& str) {
     if (str.empty()) return false;
     if (!std::isalpha(str[0]) && str[0] != '_') return false;
@@ -61,6 +68,7 @@ bool isIdentifier(const std::string& str) {
     return true;
 }
 
+// Tokenize the given Python code and return a vector of tokens
 std::vector<Token> tokenize(const std::string& code) {
     std::vector<Token> tokens;
     std::string currentToken;
@@ -84,6 +92,7 @@ std::vector<Token> tokenize(const std::string& code) {
 
         currentToken += c;
 
+        // Check for operators and delimiters
         if (isOperator(c) || isDelimiter(c)) {
             if (!currentToken.empty()) {
                 TokenType type = isKeyword(currentToken) ? KEYWORD :
@@ -100,6 +109,7 @@ std::vector<Token> tokenize(const std::string& code) {
                 tokens.push_back({DELIMITER, std::string(1, c)});
             }
         } else if (i == code.size() - 1) {
+            // Handle the last token
             TokenType type = isKeyword(currentToken) ? KEYWORD :
                              isLiteral(currentToken) ? LITERAL :
                              isIdentifier(currentToken) ? IDENTIFIER :
@@ -111,6 +121,7 @@ std::vector<Token> tokenize(const std::string& code) {
     return tokens;
 }
 
+// Print the tokens along with their types
 void printTokens(const std::vector<Token>& tokens) {
     for (const auto& token : tokens) {
         std::cout << "Type: ";
@@ -127,6 +138,7 @@ void printTokens(const std::vector<Token>& tokens) {
     }
 }
 
+// Main function
 int main() {
     std::string code = "def add(a, b):\n    return a + b\nprint(add(5, 10))";
 
@@ -135,6 +147,7 @@ int main() {
 
     return 0;
 }
+
 
 
 int main(){
