@@ -7,68 +7,9 @@
 #include <algorithm>
 #include <fstream>
 #include <map>
+#include "token.h"
 
 #define INDENT_SIZE 2
-
-enum TokenType {
-    // ids
-    IDENTIFIER,
-
-    // keywords
-    IF, ELSE, DEF, RETURN, NOT, AND, OR, TRUE, FALSE, NONE,
-
-    // operators
-    PLUS, MINUS, DIVIDE, MULTIPLY, EQUAL,
-    EQUAL_TO, GREATER_THAN, LESS_THAN, NOT_EQUAL_TO,
-    GREATER_THAN_EQUAL_TO, LESS_THAN_EQUAL_TO,
-
-    // values
-    NUMBER, STRING, LPARAN, RPARAN,
-
-    // syntax
-    NEWLINE, INDENT, DEDENT, COLON, END, COMMA,
-
-    // invalid token
-    INVALID,
-};
-
-std::vector<std::string> tokenNames = {
-    // ids
-    "IDENTIFIER",
-
-    // keywords
-    "IF", "ELSE", "DEF", "RETURN", "NOT", "AND", "OR", "TRUE", "FALSE", "NONE",
-
-    // operators
-    "PLUS", "MINUS", "DIVIDE", "MULTIPLY", "EQUAL",
-    "EQUAL_TO", "GREATER_THAN", "LESS_THAN", "NOT_EQUAL_TO",
-    "GREATER_THAN_EQUAL_TO", "LESS_THAN_EQUAL_TO",
-
-    // values
-    "NUMBER", "STRING", "LPARAN", "RPARAN",
-
-    // syntax
-    "NEWLINE", "INDENT", "DEDENT", "COLON", "END", "COMMA",
-
-    // invalid token
-    "INVALID",
-};
-
-
-struct Token {
-    TokenType type;
-    std::string value;
-
-    Token(TokenType t, std::string v) {
-        type = t;
-        value = v;
-    }
-
-    Token(TokenType t, char v) {
-        type = t;
-        value = v;
-    }
-};
 
 class Scanner {
 public:
@@ -322,7 +263,7 @@ private:
     }
 
     void error() {
-        std::runtime_error("Error parsing character " + current);
+        std::runtime_error("Error parsing character " + std::to_string(current));
     }
 };
 

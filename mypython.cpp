@@ -28,10 +28,10 @@ int main() {
     //Scanner s(code);
     //s.printTokens();
 
-    std::string code2 = openFile("example.py");
-    //std::cout << code2;
-    Scanner s2(code2);
-    s2.printTokens();
+    std::string code = openFile("testcases/in10.py");
+    //std::cout << code;
+    Scanner scan(code);
+    scan.printTokens();
 
     return 0;
 }

@@ -12,5 +12,6 @@ endif()
 project ("PythonInterpreter")
 
 # Add source to this project's executable.
-add_executable (PythonInterpreter "mypython.cpp" "tokenizer.h" )
+add_executable (PythonInterpreter "mypython.cpp" "scanner.h"  "parser.h" "token.h")
 
+file(COPY testcases/ DESTINATION testcases/)
