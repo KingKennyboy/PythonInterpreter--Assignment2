@@ -8,8 +8,9 @@
 #include <fstream>
 #include <map>
 #include "token.h"
+#include <stdexcept>
 
-#define INDENT_SIZE 2
+#define INDENT_SIZE 4
 
 class Scanner {
 public:
@@ -28,13 +29,12 @@ public:
         }
     }
 
-
 private:
     std::string code;
     std::vector<Token> tokens;
     int start = 0;
     int current = 0;
-    bool checkIndent = true;
+    bool checkIndent = false;
     int currSpaces = 0;
     std::map<std::string, TokenType> keywords = {
         {"if", IF},
@@ -67,7 +67,12 @@ private:
             return;
         }
         if (checkIndent) {
-            indent(); 
+            if (c == ' ') {
+                indent(); 
+            }
+            else {
+                checkIndent = false;
+            }
         }
         if (c == '(') 
         {
@@ -131,7 +136,8 @@ private:
         if (c == ' ') return;
         if (c == '\n') 
         {
-            addToken(NEWLINE); checkIndent = true; 
+            addToken(NEWLINE); 
+            checkIndent = true; 
             return;
         }
         if (c == '"') 
@@ -196,17 +202,24 @@ private:
     }
 
     void indent() {
-        int spaces = 0;
-        if (code[start] == ' ') {
-            spaces = 1;
-        }
+        int spaces = 1;
 
         while (peek() == ' ' && !isAtEnd()) {
             advance();
             spaces++;
         }
+        if (peek() == '\n') {
+            checkIndent = false;
+            return;
+        }
+        
+        //std::cout << spaces << " " << currSpaces << "\n";
+        //std::cout << spaces % INDENT_SIZE << "\n";
+        //std::cout << start << "\n";
 
-        if (spaces % INDENT_SIZE != 0) error();
+        if ((spaces % INDENT_SIZE) != 0) {
+            error();
+        }
 
         int temp_spaces = spaces;
         while (currSpaces > temp_spaces) {
@@ -263,7 +276,7 @@ private:
     }
 
     void error() {
-        std::runtime_error("Error parsing character " + std::to_string(current));
+        throw std::runtime_error("Error parsing character");
     }
 };
 
