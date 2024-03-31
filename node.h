@@ -4,20 +4,21 @@
 #include "token.h"
 
 enum NodeType {
-	PRIMARY, UNARY, BINARY, MULTIPLE
+	
 };
 
 struct Node {
-	NodeType type;
-	TokenType operation;
+	TokenType type;
 	std::vector<Node*> children;
+	void* data = nullptr;
 
-	Node(NodeType t) {
+	Node(TokenType t) {
 		t = type;
+		data = nullptr;
 	}
 
-	Node(NodeType t) {
-
+	void addChild(Node* c) {
+		children.push_back(c);
 	}
 };
 

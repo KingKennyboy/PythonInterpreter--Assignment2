@@ -5,7 +5,8 @@
 #include <algorithm>
 #include <fstream>
 
-#include "tokenizer.h"
+#include "scanner.h"
+#include "parser.h"
 
 std::string openFile(std::string filename) {
     std::ifstream file;
@@ -25,6 +26,7 @@ std::string openFile(std::string filename) {
 // Main function
 int main() {
     //std::string code = "def add(a, b):\n    return a + b\nprint(add(5, 10))";
+    //std::string code = "a = 10";
     //Scanner s(code);
     //s.printTokens();
 
@@ -32,6 +34,9 @@ int main() {
     //std::cout << code;
     Scanner scan(code);
     scan.printTokens();
+
+    //Parser parseObject(s.getTokens());
+    //parseObject.printNodes();
 
     return 0;
 }
