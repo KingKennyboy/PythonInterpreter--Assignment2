@@ -40,13 +40,9 @@ public:
     virtual void visitAssignExpr(Assign* expr) {};
     virtual void visitBinaryExpr(Binary* expr) {};
     virtual void visitCallExpr(Call* expr) {};
-    virtual void visitGetExpr(Get* expr) {};
     virtual void visitGroupingExpr(Grouping* expr) {};
     virtual void visitLiteralExpr(Literal* expr) {};
     virtual void visitLogicalExpr(Logical* expr) {};
-    virtual void visitSetExpr(Set* expr) {};
-    virtual void visitSuperExpr(Super* expr) {};
-    virtual void visitThisExpr(This* expr) {};
     virtual void visitUnaryExpr(Unary* expr) {};
     virtual void visitVariableExpr(Variable* expr) {};
 };
