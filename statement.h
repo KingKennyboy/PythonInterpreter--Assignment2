@@ -13,9 +13,9 @@ public:
 
 class Block : public Statement {
 public:
-	std::vector<Statement> statements;
+	std::vector<Statement*> statements;
 
-	Block(std::vector<Statement> stmts) {
+	Block(std::vector<Statement*> stmts) {
 		statements = stmts;
 	}
 
@@ -27,9 +27,9 @@ public:
 
 class Expression : public Statement {
 public:
-	Expr expr;
+	Expr* expr;
 
-	Expression(Expr expr) {
+	Expression(Expr* expr) {
 		this->expr = expr;
 	}
 
@@ -57,11 +57,11 @@ public:
 
 class If : public Statement {
 public:
-	Expr condition;
-	Statement thenBranch;
-	Statement elseBranch;
+	Expr* condition;
+	Statement* thenBranch;
+	Statement* elseBranch;
 
-	If(Expr condition, Statement thenBranch, Statement elseBranch) {
+	If(Expr* condition, Statement* thenBranch, Statement* elseBranch) {
 		this->condition = condition;
 		this->thenBranch = thenBranch;
 		this->elseBranch = elseBranch;
@@ -75,9 +75,9 @@ public:
 
 class Print : public Statement {
 public:
-	std::vector<Expr> exprs;
+	std::vector<Expr*> exprs;
 
-	Print(std::vector<Expr> exprs) {
+	Print(std::vector<Expr*> exprs) {
 		this->exprs = exprs;
 	}
 
@@ -89,9 +89,9 @@ public:
 class Return : public Statement {
 public:
 	Token keyword;
-	Expr value;
+	Expr* value;
 
-	Return(Token keyword, Expr value) {
+	Return(Token keyword, Expr* value) {
 		this->keyword = keyword;
 		this->value = value;
 	}
@@ -104,9 +104,9 @@ public:
 class Var : public Statement {
 public:
 	Token name;
-	Expr initial;
+	Expr* initial;
 
-	Var(Token name, Expr initial) {
+	Var(Token name, Expr* initial) {
 		this->name = name;
 		this->initial = initial;
 	}
@@ -114,8 +114,6 @@ public:
 	void accept(Visitor* v) override {
 		v->visitVarStatement(this);
 	}
-
-
 };
 
 

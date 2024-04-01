@@ -16,8 +16,8 @@ public:
 		this->tokens = tokens;
 	}
 
-	std::vector<Statement> parse() {
-		std::vector<Statement> statements;
+	std::vector<Statement*> parse() {
+		std::vector<Statement*> statements;
 		while (!isAtEnd()) {
 			while (match(NEWLINE)) { ; }
 			if (check(END)) {
@@ -32,7 +32,7 @@ private:
 	std::vector<Token> tokens;
 	int current = 0;
 
-	Statement declaration() {
+	Statement* declaration() {
 		//if (match(DEF)) {
 		//	return functionDeclaration();
 		//}
@@ -43,19 +43,19 @@ private:
 	}
 
 	//Statement functionDeclaration() {}
-	Statement varDeclaration() {
+	Statement* varDeclaration() {
 		Token name = consume(IDENTIFIER);
 
-		Expr initializer;
+		Expr* initializer;
 		if (match(EQUAL)) {
 			initializer = expression();
 		}
 
 		consume(NEWLINE);
-		return Var(name, initializer);
+		return new Var(name, initializer);
 	}
 
-	Statement statement() {
+	Statement* statement() {
 		if (match(IF)) {
 			return ifStatement();
 		}
@@ -68,14 +68,14 @@ private:
 		return expressionStatement();
 	}
 
-	Statement ifStatement() {
-		Expr conditional = expression();
+	Statement* ifStatement() {
+		Expr* conditional = expression();
 		consume(COLON);
 		consume(NEWLINE);
 		consume(INDENT);
 		
-		Statement thenBranch = blockStatement();
-		Statement elseBranch;
+		Statement* thenBranch = blockStatement();
+		Statement* elseBranch;
 		if (match(ELSE)) {
 			consume(COLON);
 			consume(NEWLINE);
@@ -83,130 +83,130 @@ private:
 			elseBranch = blockStatement();
 		}
 
-		return If(conditional, thenBranch, elseBranch);
+		return new If(conditional, thenBranch, elseBranch);
 	}
 
-	Statement printStatement() {
-		std::vector<Expr> args = arguments();
-		return Print(args);
+	Statement* printStatement() {
+		std::vector<Expr*> args = arguments();
+		return new Print(args);
 	}
 
 
-	Statement returnStatement() {
+	Statement* returnStatement() {
 		Token ret = previous();
-		Expr value;
+		Expr* value;
 		if (match(NEWLINE)) {
-			return Return(ret, value);
+			return new Return(ret, value);
 		}
 		value = expression();
-		return Return(ret, value);
+		return new Return(ret, value);
 	}
 
-	Statement blockStatement() {
-		std::vector<Statement> lines;
+	Statement* blockStatement() {
+		std::vector<Statement*> lines;
 		while (!match(DEDENT)) {
 			while (match(NEWLINE)) { ; }
 			lines.push_back(declaration());
 			while (match(NEWLINE)) { ; }
 		}
-		return Block(lines);
+		return new Block(lines);
 	}
 
-	Statement expressionStatement() {
-		Expr expr = expression();
-		return Expression(expr);
+	Statement* expressionStatement() {
+		Expr* expr = expression();
+		return new Expression(expr);
 	}
 
-	Expr expression() {
+	Expr* expression() {
 		return or_();
 	}
 
-	Expr or_() {
-		Expr expr = and_();
+	Expr* or_() {
+		Expr* expr = and_();
 		while (match(OR)) {
 			Token op = previous();
-			Expr rhs = and_();
-			expr = Logical(expr, op, rhs);
+			Expr* rhs = and_();
+			expr = new Logical(expr, op, rhs);
 		}
 		return expr;
 	}
 
-	Expr and_() {
-		Expr expr = comparison();
+	Expr* and_() {
+		Expr* expr = comparison();
 		while (match(AND)) {
 			Token op = previous();
-			Expr rhs = comparison();
-			expr = Logical(expr, op, rhs);
+			Expr* rhs = comparison();
+			expr = new Logical(expr, op, rhs);
 		}
 		return expr;
 	}
 
-	Expr comparison() {
-		Expr expr = term();
+	Expr* comparison() {
+		Expr* expr = term();
 		while (match(TokenTypes{NOT_EQUAL_TO, EQUAL_TO, GREATER_THAN_EQUAL_TO, GREATER_THAN, LESS_THAN, LESS_THAN_EQUAL_TO})) {
 			Token op = previous();
-			Expr rhs = term();
-			expr = Binary(expr, op, rhs);
+			Expr* rhs = term();
+			expr = new Binary(expr, op, rhs);
 		}
 		return expr;
 	}
 
-	Expr term() {
-		Expr expr = factor();
+	Expr* term() {
+		Expr* expr = factor();
 		while (match(TokenTypes{ MINUS, PLUS })) {
 			Token op = previous();
-			Expr rhs = factor();
-			expr = Binary(expr, op, rhs);
+			Expr* rhs = factor();
+			expr = new Binary(expr, op, rhs);
 		}
 		return expr;
 	}
 
-	Expr factor() {
-		Expr expr = unary();
+	Expr* factor() {
+		Expr* expr = unary();
 		while (match(TokenTypes{ MULTIPLY, DIVIDE })) {
 			Token op = previous();
-			Expr rhs = unary();
-			expr = Binary(expr, op, rhs);
+			Expr* rhs = unary();
+			expr = new Binary(expr, op, rhs);
 		}
 		return expr;
 	}
 
-	Expr unary() {
+	Expr* unary() {
 		if (match({ MINUS, NOT })) {
 			Token op = previous();
-			Expr rhs = unary();
-			return Unary(op, rhs);
+			Expr* rhs = unary();
+			return new Unary(op, rhs);
 		}
 		return call();
 	}
 
-	Expr call() {
-		Expr expr = primary();
+	Expr* call() {
+		Expr* expr = primary();
 		if (check(LPARAN)) {
-			std::vector<Expr> args = arguments();
+			std::vector<Expr*> args = arguments();
 			Token paren = previous();
-			return Call(expr, paren, args);
+			return new Call(expr, paren, args);
 		}
 		return expr;
 	}
 
-	Expr primary() {
+	Expr* primary() {
 		if (match(TokenTypes{ TRUE, FALSE, NONE })) {
-			return Literal(previous(), "");
+			return new Literal(previous(), "");
 		}
 		if (match(LPARAN)) {
-			Expr expr = expression();
+			Expr* expr = expression();
 			consume(RPARAN);
-			return Grouping(expr);
+			return new Grouping(expr);
 		}
 		if (match(TokenTypes{ IDENTIFIER, NUMBER, STRING })) {
-			return Literal(previous(), previous().value);
+			return new Literal(previous(), previous().value);
 		}
 		error();
 	}
 
-	std::vector<Expr> arguments() {
-		std::vector<Expr> args;
+	std::vector<Expr*> arguments() {
+		std::vector<Expr*> args;
 		consume(LPARAN);
 		while (!match(RPARAN)) {
 			if (args.size() > 0) {

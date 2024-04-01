@@ -8,6 +8,7 @@
 #include "scanner.h"
 #include "parser.h"
 #include "statement.h"
+#include "printer.h"
 
 std::string openFile(std::string filename) {
     std::ifstream file;
@@ -38,7 +39,10 @@ int main() {
     std::cout << "\n\n\n";
 
     Parser parser(scan.getTokens());
-    std::vector<Statement> s = parser.parse();
+    std::vector<Statement*> s = parser.parse();
+
+    Printer printer(s);
+    printer.print();
 
     return 0;
 }

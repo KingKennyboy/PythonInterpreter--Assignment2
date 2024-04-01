@@ -15,9 +15,9 @@ public:
 class Assign : public Expr {
 public:
 	Token name;
-	Expr value;
+	Expr* value;
 
-	Assign(Token name, Expr value) {
+	Assign(Token name, Expr* value) {
 		this->name = name;
 		this->value = value;
 	}
@@ -29,11 +29,11 @@ public:
 
 class Binary : public Expr {
 public:
-	Expr left;
+	Expr* left;
 	Token op;
-	Expr right;
+	Expr* right;
 
-	Binary(Expr left, Token op, Expr right) {
+	Binary(Expr* left, Token op, Expr* right) {
 		this->left = left;
 		this->op = op;
 		this->right = right;
@@ -46,11 +46,11 @@ public:
 
 class Call : public Expr {
 public:
-	Expr callee;
+	Expr* callee;
 	Token paren;
-	std::vector<Expr> args;
+	std::vector<Expr*> args;
 
-	Call(Expr callee, Token paren, std::vector<Expr> args) {
+	Call(Expr* callee, Token paren, std::vector<Expr*> args) {
 		this->callee = callee;
 		this->paren = paren;
 		this->args = args;
@@ -63,9 +63,9 @@ public:
 
 class Grouping : public Expr {
 public:
-	Expr expression;
+	Expr* expression;
 
-	Grouping(Expr expression) {
+	Grouping(Expr* expression) {
 		this->expression = expression;
 	}
 
@@ -76,11 +76,11 @@ public:
 
 class Literal : public Expr {
 public:
-	Token type;
+	Token token;
 	std::string value;
 
 	Literal(Token type, std::string value) {
-		this->type = type;
+		this->token = type;
 		this->value = value;
 	}
 
@@ -91,11 +91,11 @@ public:
 
 class Logical : public Expr {
 public:
-	Expr left;
+	Expr* left;
 	Token op;
-	Expr right;
+	Expr* right;
 
-	Logical(Expr left, Token op, Expr right) {
+	Logical(Expr* left, Token op, Expr* right) {
 		this->left = left;
 		this->op = op;
 		this->right = right;
@@ -109,9 +109,9 @@ public:
 class Unary : public Expr {
 public:
 	Token op;
-	Expr right;
+	Expr* right;
 
-	Unary(Token op, Expr right) {
+	Unary(Token op, Expr* right) {
 		this->op = op;
 		this->right = right;
 	}
