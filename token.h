@@ -8,7 +8,7 @@ enum TokenType {
     IDENTIFIER,
 
     // keywords
-    IF, ELSE, DEF, RETURN, NOT, AND, OR, TRUE, FALSE, NONE,
+    IF, ELSE, DEF, RETURN, NOT, AND, OR, TRUE, FALSE, NONE, PRINT,
 
     // operators
     PLUS, MINUS, DIVIDE, MULTIPLY, EQUAL,
@@ -30,7 +30,7 @@ std::vector<std::string> tokenNames = {
     "IDENTIFIER",
 
     // keywords
-    "IF", "ELSE", "DEF", "RETURN", "NOT", "AND", "OR", "TRUE", "FALSE", "NONE",
+    "IF", "ELSE", "DEF", "RETURN", "NOT", "AND", "OR", "TRUE", "FALSE", "NONE", "PRINT",
 
     // operators
     "PLUS", "MINUS", "DIVIDE", "MULTIPLY", "EQUAL",

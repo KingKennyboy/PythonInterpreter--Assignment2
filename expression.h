@@ -1,8 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include "visitor.h"
 #include "token.h"
+
 
 class Expr {
 public:
@@ -26,6 +28,7 @@ public:
 };
 
 class Binary : public Expr {
+public:
 	Expr left;
 	Token op;
 	Expr right;
@@ -40,7 +43,9 @@ class Binary : public Expr {
 		v->visitBinaryExpr(this);
 	}
 };
+
 class Call : public Expr {
+public:
 	Expr callee;
 	Token paren;
 	std::vector<Expr> args;
@@ -57,6 +62,7 @@ class Call : public Expr {
 };
 
 class Grouping : public Expr {
+public:
 	Expr expression;
 
 	Grouping(Expr expression) {
@@ -69,10 +75,11 @@ class Grouping : public Expr {
 };
 
 class Literal : public Expr {
+public:
 	Token type;
-	void* value;
+	std::string value;
 
-	Literal(Token type, void* value) {
+	Literal(Token type, std::string value) {
 		this->type = type;
 		this->value = value;
 	}
@@ -83,6 +90,7 @@ class Literal : public Expr {
 };
 
 class Logical : public Expr {
+public:
 	Expr left;
 	Token op;
 	Expr right;
@@ -99,6 +107,7 @@ class Logical : public Expr {
 };
 
 class Unary : public Expr {
+public:
 	Token op;
 	Expr right;
 
@@ -113,6 +122,7 @@ class Unary : public Expr {
 };
 
 class Variable : public Expr {
+public:
 	Token name;
 
 	Variable(Token name) {
@@ -123,5 +133,3 @@ class Variable : public Expr {
 		v->visitVariableExpr(this);
 	}
 };
-
-

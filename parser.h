@@ -1,116 +1,273 @@
-//#pragma once
-//
-//#include <string>
-//#include <vector>
-//#include <iostream>
-//#include "token.h"
-//#include "node.h"
-//
-///*
-//<file>         => <lines>
-//<lines>        => <line> NEWLINE <lines> | END
-//<line>         => DEF <function> | IDENTIFIER EQUAL <expression> | IDENTIFIER LPAREN <arguments> RPAREN | IF <control> | <expression> | EPSILON
-//<function>     => IDENTIFIER RPAREN <arguments> LPAREN COLON NEWLINE <block>
-//<control>      => <boolean>: \n <block> | <boolean>: \n <block> ELSE: \n <block>
-//
-//<arguments>    => <expression> COMMA <arguments> | <expression>
-//<block>        => INDENT <lines> DEDENT
-//
-//<expression>   => <equality>
-//<equality>     => <conditional> AND <equality> | <conditional> OR <equality> | <conditional>
-//<conditional>  => NOT <conditional> | <comparison>
-//<comparison>   => <term> == <comparison> | <term> != <comparison> | <term> <= <comparison> | <term> >= <comparison> |
-//		  <term> >  <comparison> | <term>  < <comparison> | <term>
-//<term>	       => <factor> - <term> | <factor> + <term> | <factor>
-//<factor>       => <unary> / <factor> | <unary> * <factor> | <unary>
-//<unary>	       => NOT <unary> | - <unary> | <primary>
-//<primary>      => NUMBER | STRING | TRUE | FALSE | NONE | IDENTIFIER(<arguments>)
-//
-//*/
-//
-//
-//typedef std::vector<TokenType> TokenTypes;
-//
-//class Parser {
-//
-//public:
-//	Parser(std::vector<Token> tokens) {
-//		this->tokens = tokens;
-//		parse();
-//	}
-//
-//	Node* getRootNode() {
-//		return root;
-//	}
-//
-//	void printNodes() {
-//		printNodeHelper(root);
-//	}
-//
-//
-//private:
-//	std::vector<Token> tokens;
-//	int current = 0;
-//	std::vector<
-//
-//	Node* root;
-//
-//	void printNodeHelper(Node* curr) {
-//		std::cout << "Operation: " << tokenNames[curr->type];
-//		std::cout << ",Children: ";
-//		for (Node* node : curr->children) {
-//			std::cout << "\n";
-//			printNodeHelper(node);
-//		}
-//		std::cout << "\n";
-//	}
-//
-//	void parse() {
-//		while (!isAtEnd()) {
-//
-//		}
-//	}
-//
-//	void error() {
-//		std::runtime_error("Error matching Token: " + tokenNames[peek().type]);
-//	}
-//
-//	bool match(std::vector<TokenType> types) {
-//		for (TokenType t : types) {
-//			if (check(t)) {
-//				advance();
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//	bool match(TokenType type) {
-//		if (check(type)) {
-//			advance();
-//			return true;
-//		}
-//		return false;
-//	}
-//	bool check(TokenType t) {
-//		if (isAtEnd()) return false;
-//		return peek().type == t;
-//	}
-//	Token advance() {
-//		if (!isAtEnd()) current++;
-//		return previous();
-//	}
-//	Token peek() {
-//		return tokens.at(current);
-//	}
-//	Token peekNext() {
-//		if (!(current + 1 >= tokens.size())) current++;
-//		return tokens.at(current + 1);
-//	}
-//	Token previous() {
-//		return tokens.at(current - 1);
-//	}
-//	bool isAtEnd() {
-//		return (current >= tokens.size());
-//	}
-//
-//};
+#pragma once
+
+#include <string>
+#include <vector>
+#include <iostream>
+#include "token.h"
+#include "statement.h"
+#include "expression.h"
+
+typedef std::vector<TokenType> TokenTypes;
+
+class Parser {
+
+public:
+	Parser(std::vector<Token> tokens) {
+		this->tokens = tokens;
+	}
+
+	std::vector<Statement> parse() {
+		std::vector<Statement> statements;
+		while (!isAtEnd()) {
+			while (match(NEWLINE)) { ; }
+			if (check(END)) {
+				break;
+			}
+			statements.push_back(declaration());
+		}
+		return statements;
+	}
+
+private:
+	std::vector<Token> tokens;
+	int current = 0;
+
+	Statement declaration() {
+		//if (match(DEF)) {
+		//	return functionDeclaration();
+		//}
+		if (peek().type == IDENTIFIER && peekNext().type == EQUAL) {
+			return varDeclaration();
+		}
+		return statement();
+	}
+
+	//Statement functionDeclaration() {}
+	Statement varDeclaration() {
+		Token name = consume(IDENTIFIER);
+
+		Expr initializer;
+		if (match(EQUAL)) {
+			initializer = expression();
+		}
+
+		consume(NEWLINE);
+		return Var(name, initializer);
+	}
+
+	Statement statement() {
+		if (match(IF)) {
+			return ifStatement();
+		}
+		if (match(PRINT)) {
+			return printStatement();
+		}
+		if (match(RETURN)) {
+			return returnStatement();
+		}
+		return expressionStatement();
+	}
+
+	Statement ifStatement() {
+		Expr conditional = expression();
+		consume(COLON);
+		consume(NEWLINE);
+		consume(INDENT);
+		
+		Statement thenBranch = blockStatement();
+		Statement elseBranch;
+		if (match(ELSE)) {
+			consume(COLON);
+			consume(NEWLINE);
+			consume(INDENT);
+			elseBranch = blockStatement();
+		}
+
+		return If(conditional, thenBranch, elseBranch);
+	}
+
+	Statement printStatement() {
+		std::vector<Expr> args = arguments();
+		return Print(args);
+	}
+
+
+	Statement returnStatement() {
+		Token ret = previous();
+		Expr value;
+		if (match(NEWLINE)) {
+			return Return(ret, value);
+		}
+		value = expression();
+		return Return(ret, value);
+	}
+
+	Statement blockStatement() {
+		std::vector<Statement> lines;
+		while (!match(DEDENT)) {
+			while (match(NEWLINE)) { ; }
+			lines.push_back(declaration());
+			while (match(NEWLINE)) { ; }
+		}
+		return Block(lines);
+	}
+
+	Statement expressionStatement() {
+		Expr expr = expression();
+		return Expression(expr);
+	}
+
+	Expr expression() {
+		return or_();
+	}
+
+	Expr or_() {
+		Expr expr = and_();
+		while (match(OR)) {
+			Token op = previous();
+			Expr rhs = and_();
+			expr = Logical(expr, op, rhs);
+		}
+		return expr;
+	}
+
+	Expr and_() {
+		Expr expr = comparison();
+		while (match(AND)) {
+			Token op = previous();
+			Expr rhs = comparison();
+			expr = Logical(expr, op, rhs);
+		}
+		return expr;
+	}
+
+	Expr comparison() {
+		Expr expr = term();
+		while (match(TokenTypes{NOT_EQUAL_TO, EQUAL_TO, GREATER_THAN_EQUAL_TO, GREATER_THAN, LESS_THAN, LESS_THAN_EQUAL_TO})) {
+			Token op = previous();
+			Expr rhs = term();
+			expr = Binary(expr, op, rhs);
+		}
+		return expr;
+	}
+
+	Expr term() {
+		Expr expr = factor();
+		while (match(TokenTypes{ MINUS, PLUS })) {
+			Token op = previous();
+			Expr rhs = factor();
+			expr = Binary(expr, op, rhs);
+		}
+		return expr;
+	}
+
+	Expr factor() {
+		Expr expr = unary();
+		while (match(TokenTypes{ MULTIPLY, DIVIDE })) {
+			Token op = previous();
+			Expr rhs = unary();
+			expr = Binary(expr, op, rhs);
+		}
+		return expr;
+	}
+
+	Expr unary() {
+		if (match({ MINUS, NOT })) {
+			Token op = previous();
+			Expr rhs = unary();
+			return Unary(op, rhs);
+		}
+		return call();
+	}
+
+	Expr call() {
+		Expr expr = primary();
+		if (check(LPARAN)) {
+			std::vector<Expr> args = arguments();
+			Token paren = previous();
+			return Call(expr, paren, args);
+		}
+		return expr;
+	}
+
+	Expr primary() {
+		if (match(TokenTypes{ TRUE, FALSE, NONE })) {
+			return Literal(previous(), "");
+		}
+		if (match(LPARAN)) {
+			Expr expr = expression();
+			consume(RPARAN);
+			return Grouping(expr);
+		}
+		if (match(TokenTypes{ IDENTIFIER, NUMBER, STRING })) {
+			return Literal(previous(), previous().value);
+		}
+		error();
+	}
+
+	std::vector<Expr> arguments() {
+		std::vector<Expr> args;
+		consume(LPARAN);
+		while (!match(RPARAN)) {
+			if (args.size() > 0) {
+				consume(COMMA);
+			}
+			args.push_back(expression());
+		}
+
+		return args;
+	}
+
+	void error() {
+		std::cout << "\n" << tokenNames[previous().type] << " " << previous().value;
+		std::cout << "\n" << tokenNames[peek().type] << " " << peek().value;
+		std::cout << "\n" << tokenNames[peekNext().type] << " " << peekNext().value;
+		throw std::runtime_error("Error parsing Token: " + tokenNames[peek().type]);
+	}
+
+	bool match(std::vector<TokenType> types) {
+		for (TokenType t : types) {
+			if (check(t)) {
+				advance();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	Token consume(TokenType type) {
+		if (check(type)) return advance();
+
+		error();
+	}
+
+	bool match(TokenType type) {
+		if (check(type)) {
+			advance();
+			return true;
+		}
+		return false;
+	}
+	bool check(TokenType t) {
+		if (isAtEnd()) return false;
+		return peek().type == t;
+	}
+	Token advance() {
+		if (!isAtEnd()) current++;
+		return previous();
+	}
+	Token peek() {
+		return tokens.at(current);
+	}
+	Token peekNext() {
+		if (current + 1 >= tokens.size()) return tokens.at(current);
+		return tokens.at(current + 1);
+	}
+	Token previous() {
+		return tokens.at(current - 1);
+	}
+	bool isAtEnd() {
+		return (current >= tokens.size());
+	}
+
+};

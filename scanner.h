@@ -46,7 +46,8 @@ private:
         {"or", OR},
         {"True", TRUE},
         {"False", FALSE},
-        {"None", NONE}
+        {"None", NONE},
+        {"print", PRINT}
     };
 
     void scanTokens() {
@@ -66,12 +67,18 @@ private:
             checkIndent = false;
             return;
         }
+        if (c == '\n')
+        {
+            addToken(NEWLINE);
+            checkIndent = true;
+            return;
+        }
         if (checkIndent) {
             if (c == ' ') {
-                indent(); 
+                indent(1);
             }
             else {
-                checkIndent = false;
+                indent(0);
             }
         }
         if (c == '(') 
@@ -134,12 +141,6 @@ private:
             return;
         }
         if (c == ' ') return;
-        if (c == '\n') 
-        {
-            addToken(NEWLINE); 
-            checkIndent = true; 
-            return;
-        }
         if (c == '"') 
         {
             string(); 
@@ -201,13 +202,14 @@ private:
         return isAlphaNumeric(c) || c == '_';
     }
 
-    void indent() {
-        int spaces = 1;
-
-        while (peek() == ' ' && !isAtEnd()) {
-            advance();
-            spaces++;
+    void indent(int spaces) {
+        if (spaces == 1) {
+            while (peek() == ' ' && !isAtEnd()) {
+                advance();
+                spaces++;
+            }
         }
+
         if (peek() == '\n') {
             checkIndent = false;
             return;

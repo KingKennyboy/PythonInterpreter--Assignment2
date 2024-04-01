@@ -26,6 +26,7 @@ public:
 };
 
 class Expression : public Statement {
+public:
 	Expr expr;
 
 	Expression(Expr expr) {
@@ -38,6 +39,7 @@ class Expression : public Statement {
 };
 
 class Function : public Statement {
+public:
 	Token name;
 	std::vector<Token> params; 
 	std::vector<Statement*> body;
@@ -54,6 +56,7 @@ class Function : public Statement {
 };
 
 class If : public Statement {
+public:
 	Expr condition;
 	Statement thenBranch;
 	Statement elseBranch;
@@ -72,10 +75,10 @@ class If : public Statement {
 
 class Print : public Statement {
 public:
-	Expr expr;
+	std::vector<Expr> exprs;
 
-	Print(Expr expr) {
-		this->expr = expr;
+	Print(std::vector<Expr> exprs) {
+		this->exprs = exprs;
 	}
 
 	void accept(Visitor* v) override {
