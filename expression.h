@@ -4,12 +4,14 @@
 #include <string>
 #include "visitor.h"
 #include "token.h"
+#include "object.h"
 
 
 class Expr {
 public:
 	virtual ~Expr() {}
-	virtual void accept(Visitor* v) {};
+	virtual void accept(Visitor<void>* v) {};
+	virtual void accept(Visitor<Object>* v) {};
 };
 
 class Assign : public Expr {
@@ -22,7 +24,11 @@ public:
 		this->value = value;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitAssignExpr(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitAssignExpr(this);
 	}
 };
@@ -39,7 +45,11 @@ public:
 		this->right = right;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitBinaryExpr(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitBinaryExpr(this);
 	}
 };
@@ -56,7 +66,11 @@ public:
 		this->args = args;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitCallExpr(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitCallExpr(this);
 	}
 };
@@ -69,7 +83,11 @@ public:
 		this->expression = expression;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitGroupingExpr(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitGroupingExpr(this);
 	}
 };
@@ -84,7 +102,11 @@ public:
 		this->value = value;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitLiteralExpr(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitLiteralExpr(this);
 	}
 };
@@ -101,7 +123,11 @@ public:
 		this->right = right;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitLogicalExpr(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitLogicalExpr(this);
 	}
 };
@@ -116,7 +142,11 @@ public:
 		this->right = right;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitUnaryExpr(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitUnaryExpr(this);
 	}
 };
@@ -129,7 +159,11 @@ public:
 		this->name = name;
 	}
 
-	void accept(Visitor* v) override{
+	void accept(Visitor<void>* v) override{
+		v->visitVariableExpr(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitVariableExpr(this);
 	}
 };

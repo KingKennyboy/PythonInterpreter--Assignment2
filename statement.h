@@ -4,11 +4,13 @@
 #include "token.h"
 #include "expression.h"
 #include "visitor.h"
+#include "object.h"
 
 class Statement {
 public:
 	virtual ~Statement() {}
-	virtual void accept(Visitor* v) {};
+	virtual void accept(Visitor<void>* v) {};
+	virtual void accept(Visitor<Object>* v) {};
 };
 
 class Block : public Statement {
@@ -19,10 +21,13 @@ public:
 		statements = stmts;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
 		v->visitBlockStmt(this);
 	}
 
+	void accept(Visitor<Object>* v) override {
+		v->visitBlockStmt(this);
+	}
 };
 
 class Expression : public Statement {
@@ -33,7 +38,11 @@ public:
 		this->expr = expr;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitExpressionStmt(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitExpressionStmt(this);
 	}
 };
@@ -50,7 +59,11 @@ public:
 		this->body = body;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitFunctionStmt(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitFunctionStmt(this);
 	}
 };
@@ -67,7 +80,11 @@ public:
 		this->elseBranch = elseBranch;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitIfStmt(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitIfStmt(this);
 	}
 };
@@ -81,7 +98,11 @@ public:
 		this->exprs = exprs;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitPrintStatement(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitPrintStatement(this);
 	}
 };
@@ -96,7 +117,11 @@ public:
 		this->value = value;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitReturnStmt(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitReturnStmt(this);
 	}
 };
@@ -111,10 +136,11 @@ public:
 		this->initial = initial;
 	}
 
-	void accept(Visitor* v) override {
+	void accept(Visitor<void>* v) override {
+		v->visitVarStatement(this);
+	}
+
+	void accept(Visitor<Object>* v) override {
 		v->visitVarStatement(this);
 	}
 };
-
-
-

@@ -46,7 +46,7 @@ private:
 	Statement* varDeclaration() {
 		Token name = consume(IDENTIFIER);
 
-		Expr* initializer;
+		Expr* initializer = nullptr;
 		if (match(EQUAL)) {
 			initializer = expression();
 		}
@@ -75,7 +75,7 @@ private:
 		consume(INDENT);
 		
 		Statement* thenBranch = blockStatement();
-		Statement* elseBranch;
+		Statement* elseBranch = nullptr;
 		if (match(ELSE)) {
 			consume(COLON);
 			consume(NEWLINE);

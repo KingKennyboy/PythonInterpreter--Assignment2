@@ -7,7 +7,7 @@
 #include "token.h"
 
 
-class Printer : Visitor {
+class Printer : Visitor<void> {
 public:
     std::vector<Statement*> stmts;
 

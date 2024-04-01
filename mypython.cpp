@@ -32,7 +32,7 @@ int main() {
     //Scanner s(code);
     //s.printTokens();
 
-    std::string code = openFile("testcases/in10.py");
+    std::string code = openFile("testcases/in01.py");
     //std::cout << code;
     Scanner scan(code);
     scan.printTokens();

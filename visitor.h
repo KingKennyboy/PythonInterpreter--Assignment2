@@ -26,24 +26,24 @@ class This;
 class Unary;
 class Variable;
 
+template <class T>
 class Visitor {
 public:
-    virtual void visitVarStatement(Var* stmt) {};
-    virtual void visitBlockStmt(Block* stmt) {};
-    virtual void visitExpressionStmt(Expression* stmt) {};
-    virtual void visitFunctionStmt(Function* stmt) {};
-    virtual void visitIfStmt(If* stmt) {};
-	virtual void visitPrintStatement(Print* stmt) {};
-    virtual void visitReturnStmt(Return* stmt) {};
-    virtual void visitVarStmt(Var* stmt) {};
+    virtual T visitVarStatement(Var* stmt) {};
+    virtual T visitBlockStmt(Block* stmt) {};
+    virtual T visitExpressionStmt(Expression* stmt) {};
+    virtual T visitFunctionStmt(Function* stmt) {};
+    virtual T visitIfStmt(If* stmt) {};
+    virtual T visitPrintStatement(Print* stmt) {};
+    virtual T visitReturnStmt(Return* stmt) {};
 
-    virtual void visitAssignExpr(Assign* expr) {};
-    virtual void visitBinaryExpr(Binary* expr) {};
-    virtual void visitCallExpr(Call* expr) {};
-    virtual void visitGroupingExpr(Grouping* expr) {};
-    virtual void visitLiteralExpr(Literal* expr) {};
-    virtual void visitLogicalExpr(Logical* expr) {};
-    virtual void visitUnaryExpr(Unary* expr) {};
-    virtual void visitVariableExpr(Variable* expr) {};
+    virtual T visitAssignExpr(Assign* expr) {};
+    virtual T visitBinaryExpr(Binary* expr) {};
+    virtual T visitCallExpr(Call* expr) {};
+    virtual T visitGroupingExpr(Grouping* expr) {};
+    virtual T visitLiteralExpr(Literal* expr) {};
+    virtual T visitLogicalExpr(Logical* expr) {};
+    virtual T visitUnaryExpr(Unary* expr) {};
+    virtual T visitVariableExpr(Variable* expr) {};
 };
 
