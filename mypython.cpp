@@ -27,24 +27,19 @@ std::string openFile(std::string filename) {
 }
 
 // Main function
-int main() {
-    //std::string code = "def add(a, b):\n    return a + b\nprint(add(5, 10))";
-    //std::string code = "a = 10";
-    //Scanner s(code);
-    //s.printTokens();
+int main(int argc, char * argv[]) {
+    if (argc != 2) {
+        std::cout << "usage: mypython <file.py>";
+        return 1;
+    }
 
-    std::string code = openFile("testcases/in10.py");
-    //std::cout << code;
+    std::string code = openFile(std::string(argv[1]));
     Scanner scan(code);
-    //scan.printTokens();
-    //std::cout << "\n\n";
-
     Parser parser(scan.getTokens());
     std::vector<Statement*> s = parser.parse();
 
-    Printer printer(s);
+    //Printer printer(s);
     //printer.print();
-    //std::cout << "\n\n";
 
     Interpreter interpreter(s);
     interpreter.run();

@@ -9,9 +9,9 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
-project ("PythonInterpreter")
+project (mypython)
 
 # Add source to this project's executable.
-add_executable (PythonInterpreter "mypython.cpp" "scanner.h"  "parser.h" "token.h" "expression.h" "statement.h" "visitor.h" "interpreter.h" "printer.h" "environment.h" "object.h")
+add_executable (mypython "mypython.cpp" "scanner.h"  "parser.h" "token.h" "expression.h" "statement.h" "visitor.h" "interpreter.h" "printer.h" "environment.h" "object.h")
 
 file(COPY testcases/ DESTINATION testcases/)
