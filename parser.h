@@ -94,7 +94,7 @@ private:
 
 	Statement* returnStatement() {
 		Token ret = previous();
-		Expr* value;
+		Expr* value = nullptr;
 		if (match(NEWLINE)) {
 			return new Return(ret, value);
 		}

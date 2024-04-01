@@ -9,6 +9,7 @@
 #include "parser.h"
 #include "statement.h"
 #include "printer.h"
+#include "interpreter.h"
 
 std::string openFile(std::string filename) {
     std::ifstream file;
@@ -32,17 +33,21 @@ int main() {
     //Scanner s(code);
     //s.printTokens();
 
-    std::string code = openFile("testcases/in01.py");
+    std::string code = openFile("testcases/in10.py");
     //std::cout << code;
     Scanner scan(code);
-    scan.printTokens();
-    std::cout << "\n\n\n";
+    //scan.printTokens();
+    //std::cout << "\n\n";
 
     Parser parser(scan.getTokens());
     std::vector<Statement*> s = parser.parse();
 
     Printer printer(s);
-    printer.print();
+    //printer.print();
+    //std::cout << "\n\n";
+
+    Interpreter interpreter(s);
+    interpreter.run();
 
     return 0;
 }

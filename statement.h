@@ -10,7 +10,7 @@ class Statement {
 public:
 	virtual ~Statement() {}
 	virtual void accept(Visitor<void>* v) {};
-	virtual void accept(Visitor<Object>* v) {};
+	virtual Object* accept(Visitor<Object*>* v) { return nullptr;  };
 };
 
 class Block : public Statement {
@@ -25,8 +25,8 @@ public:
 		v->visitBlockStmt(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitBlockStmt(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitBlockStmt(this);
 	}
 };
 
@@ -42,8 +42,8 @@ public:
 		v->visitExpressionStmt(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitExpressionStmt(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitExpressionStmt(this);
 	}
 };
 
@@ -63,8 +63,8 @@ public:
 		v->visitFunctionStmt(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitFunctionStmt(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitFunctionStmt(this);
 	}
 };
 
@@ -84,8 +84,8 @@ public:
 		v->visitIfStmt(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitIfStmt(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitIfStmt(this);
 	}
 };
 
@@ -102,8 +102,8 @@ public:
 		v->visitPrintStatement(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitPrintStatement(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitPrintStatement(this);
 	}
 };
 
@@ -121,8 +121,8 @@ public:
 		v->visitReturnStmt(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitReturnStmt(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitReturnStmt(this);
 	}
 };
 
@@ -140,7 +140,7 @@ public:
 		v->visitVarStatement(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitVarStatement(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitVarStatement(this);
 	}
 };

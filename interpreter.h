@@ -10,7 +10,7 @@
 #include "statement.h"
 #include "object.h"
 
-class Interpreter: public Visitor<Object> {
+class Interpreter: public Visitor<Object*> {
 public:
     std::vector<Statement*> stmts;
 
@@ -25,24 +25,179 @@ public:
         }
     };
 
-    Object visitVarStatement(Var* stmt) {};
-    Object visitBlockStmt(Block* stmt) {};
-    Object visitExpressionStmt(Expression* stmt) {};
-    Object visitFunctionStmt(Function* stmt) {};
-    Object visitIfStmt(If* stmt) {};
-    Object visitPrintStatement(Print* stmt) {};
-    Object visitReturnStmt(Return* stmt) {};
-    
-    Object visitAssignExpr(Assign* expr) {};
-    Object visitBinaryExpr(Binary* expr) {};
-    Object visitCallExpr(Call* expr) {};
-    Object visitGroupingExpr(Grouping* expr) {};
-    Object visitLiteralExpr(Literal* expr) {};
-    Object visitLogicalExpr(Logical* expr) {};
-    Object visitUnaryExpr(Unary* expr) {};
-    Object visitVariableExpr(Variable* expr) {};
+    Object* evaluate(Statement* stmt) {
+        return stmt->accept(this);
+    }
+
+    Object* evaluate(Expr* expr) {
+        return expr->accept(this);
+    }
+
+    Object* visitVarStatement(Var* stmt) {
+        env->set(stmt->name.value, stmt->initial->accept(this));
+        return nullptr;
+    };
+    Object* visitBlockStmt(Block* stmt) {
+        for (auto s : stmt->statements) {
+            s->accept(this);
+        }
+        return nullptr;
+    };
+    Object* visitExpressionStmt(Expression* stmt) {
+        stmt->accept(this);
+        return nullptr;
+    };
+    Object* visitFunctionStmt(Function* stmt) {
+        return nullptr;
+    };
+    Object* visitIfStmt(If* stmt) {
+        Object* conditional_obj = evaluate(stmt->condition);
+        Boolean* conditional = dynamic_cast<Boolean*>(conditional_obj);
+        if (conditional == nullptr) {
+            error();
+        }
+
+        if (conditional != nullptr && conditional->value) {
+            evaluate(stmt->thenBranch);
+        }
+        else if (stmt->elseBranch != nullptr) {
+            evaluate(stmt->elseBranch);
+        }
+
+        return nullptr;
+    };
+    Object* visitPrintStatement(Print* stmt) {
+        for (size_t i = 0; i < stmt->exprs.size(); i++) {
+            if (i != 0) {
+                std::cout << " ";
+            }
+            Object* v = evaluate(stmt->exprs[i]);
+            std::cout << v->toString();
+        }
+        std::cout << "\n";
+        return nullptr;
+    };
+    Object* visitReturnStmt(Return* stmt) {
+        return nullptr;
+    };
+    Object* visitAssignExpr(Assign* expr) {
+        return nullptr;
+    };
+    Object* visitBinaryExpr(Binary* expr) {
+        Object* rhs_obj = evaluate(expr->right);
+        Object* lhs_obj = evaluate(expr->left);
+        Integer* lhs_int = dynamic_cast<Integer*>(lhs_obj);
+        Integer* rhs_int = dynamic_cast<Integer*>(rhs_obj);
+        Boolean* lhs_bool = dynamic_cast<Boolean*>(lhs_obj);
+        Boolean* rhs_bool = dynamic_cast<Boolean*>(rhs_obj);
+
+        Boolean* res = nullptr;;
+        switch (expr->op.type) {
+        case EQUAL_TO:
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Boolean(lhs_int == rhs_int);
+            }
+            else if (lhs_bool != nullptr && rhs_bool != nullptr) {
+                return new Boolean(lhs_bool == rhs_bool);
+            }
+        case NOT_EQUAL_TO:
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Boolean(lhs_int != rhs_int);
+            }
+            else if (lhs_bool != nullptr && rhs_bool != nullptr) {
+                return new Boolean(lhs_bool != rhs_bool);
+            }
+        case GREATER_THAN:
+            return new Boolean(lhs_int->value > rhs_int->value);
+        case LESS_THAN:
+            return new Boolean(lhs_int->value < rhs_int->value);
+        case GREATER_THAN_EQUAL_TO:
+            return new Boolean(lhs_int->value >= rhs_int->value);
+        case LESS_THAN_EQUAL_TO:
+            return new Boolean(lhs_int->value <= rhs_int->value);
+        case MINUS:
+            return new Integer(lhs_int->value - rhs_int->value);
+        case PLUS:
+            return new Integer(lhs_int->value + rhs_int->value);
+        case DIVIDE:
+            return new Integer((int)(lhs_int->value / rhs_int->value));
+        case MULTIPLY:
+            return new Integer((int)(lhs_int->value * rhs_int->value));
+        }
+
+        error();
+        return nullptr;
+    };
+    Object* visitCallExpr(Call* expr) {
+        return nullptr;
+    };
+    Object* visitGroupingExpr(Grouping* expr) {
+        return evaluate(expr->expression);
+    };
+    Object* visitLiteralExpr(Literal* expr) {
+        switch (expr->token.type) {
+        case TRUE:
+            return new Boolean(true);
+        case FALSE:
+            return new Boolean(false);
+        case NONE:
+            return new None();
+        case IDENTIFIER:
+            return env->get(expr->token.value);
+        case NUMBER:
+            return new Integer(std::stoi(expr->token.value));
+        case STRING:
+            return new String(expr->token.value);
+        }
+    };
+    Object* visitLogicalExpr(Logical* expr) {
+        Object* rhs_obj = evaluate(expr->right);
+        Object* lhs_obj = evaluate(expr->left);
+        Boolean* lhs_bool = dynamic_cast<Boolean*>(lhs_obj);
+        Boolean* rhs_bool = dynamic_cast<Boolean*>(rhs_obj);
+
+        if (lhs_bool != nullptr && rhs_bool != nullptr) {
+            switch (expr->op.type) {
+            case AND:
+                return new Boolean(lhs_bool->value && rhs_bool->value);
+            case OR:
+                return new Boolean(lhs_bool->value || rhs_bool->value);
+            }
+        }
+        error();
+        return nullptr;
+    };
+    Object* visitUnaryExpr(Unary* expr) {
+        Object* rhs_obj = evaluate(expr->right);
+        Integer* rhs_int = dynamic_cast<Integer*>(rhs_obj);
+        Boolean* rhs_bool = dynamic_cast<Boolean*>(rhs_obj);
+
+        switch (expr->op.type) {
+        case MINUS:
+            if (rhs_int == nullptr) { error(); return nullptr; }
+            else {
+                return new Integer(-rhs_int->value);
+            }
+        case NOT:
+            if (rhs_bool == nullptr) { error(); return nullptr; }
+            else if (rhs_bool != nullptr && rhs_bool->value) { return new Boolean(false); }
+            else {
+                return new Boolean(true);
+            }
+        }
+
+        error();
+        return nullptr;
+    };
+    Object* visitVariableExpr(Variable* expr) {
+        return nullptr;
+    };
 
 private:
     Environment* env;
     std::stack<int> tempInteger;
+
+    void error() {
+        throw std::runtime_error("Error interpreter");
+    }
 };

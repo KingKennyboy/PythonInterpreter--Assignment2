@@ -9,9 +9,9 @@
 
 class Expr {
 public:
-	virtual ~Expr() {}
+	virtual ~Expr() {};
 	virtual void accept(Visitor<void>* v) {};
-	virtual void accept(Visitor<Object>* v) {};
+	virtual Object* accept(Visitor<Object*>* v) { return nullptr;  };
 };
 
 class Assign : public Expr {
@@ -28,8 +28,8 @@ public:
 		v->visitAssignExpr(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitAssignExpr(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitAssignExpr(this);
 	}
 };
 
@@ -49,8 +49,8 @@ public:
 		v->visitBinaryExpr(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitBinaryExpr(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitBinaryExpr(this);
 	}
 };
 
@@ -70,8 +70,8 @@ public:
 		v->visitCallExpr(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitCallExpr(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitCallExpr(this);
 	}
 };
 
@@ -87,8 +87,8 @@ public:
 		v->visitGroupingExpr(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitGroupingExpr(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitGroupingExpr(this);
 	}
 };
 
@@ -106,8 +106,8 @@ public:
 		v->visitLiteralExpr(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitLiteralExpr(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitLiteralExpr(this);
 	}
 };
 
@@ -127,8 +127,8 @@ public:
 		v->visitLogicalExpr(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitLogicalExpr(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitLogicalExpr(this);
 	}
 };
 
@@ -146,8 +146,8 @@ public:
 		v->visitUnaryExpr(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitUnaryExpr(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitUnaryExpr(this);
 	}
 };
 
@@ -163,7 +163,7 @@ public:
 		v->visitVariableExpr(this);
 	}
 
-	void accept(Visitor<Object>* v) override {
-		v->visitVariableExpr(this);
+	Object* accept(Visitor<Object*>* v) override {
+		return v->visitVariableExpr(this);
 	}
 };
