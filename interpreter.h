@@ -165,6 +165,8 @@ public:
         case STRING:
             return new String(expr->token.value);
         }
+        error();
+        return nullptr;
     };
     Object* visitLogicalExpr(Logical* expr) {
         Object* rhs_obj = evaluate(expr->right);

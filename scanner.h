@@ -270,7 +270,7 @@ private:
     }
 
     void addToken(TokenType t) {
-        tokens.push_back(Token(t, NULL));
+        tokens.push_back(Token(t, ""));
     }
 
     void addToken(TokenType t, std::string v) {

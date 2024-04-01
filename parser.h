@@ -203,6 +203,7 @@ private:
 			return new Literal(previous(), previous().value);
 		}
 		error();
+		return nullptr;
 	}
 
 	std::vector<Expr*> arguments() {
@@ -239,6 +240,7 @@ private:
 		if (check(type)) return advance();
 
 		error();
+		return peek();
 	}
 
 	bool match(TokenType type) {
