@@ -95,34 +95,50 @@ public:
         switch (expr->op.type) {
         case EQUAL_TO:
             if (lhs_int != nullptr && rhs_int != nullptr) {
-                return new Boolean(lhs_int == rhs_int);
+                return new Boolean(lhs_int->value == rhs_int->value);
             }
             else if (lhs_bool != nullptr && rhs_bool != nullptr) {
-                return new Boolean(lhs_bool == rhs_bool);
+                return new Boolean(lhs_bool->value == rhs_bool->value);
             }
         case NOT_EQUAL_TO:
             if (lhs_int != nullptr && rhs_int != nullptr) {
-                return new Boolean(lhs_int != rhs_int);
+                return new Boolean(lhs_int->value != rhs_int->value);
             }
             else if (lhs_bool != nullptr && rhs_bool != nullptr) {
-                return new Boolean(lhs_bool != rhs_bool);
+                return new Boolean(lhs_bool->value != rhs_bool->value);
             }
         case GREATER_THAN:
-            return new Boolean(lhs_int->value > rhs_int->value);
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Boolean(lhs_int->value > rhs_int->value);
+            }
         case LESS_THAN:
-            return new Boolean(lhs_int->value < rhs_int->value);
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Boolean(lhs_int->value < rhs_int->value);
+            }
         case GREATER_THAN_EQUAL_TO:
-            return new Boolean(lhs_int->value >= rhs_int->value);
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Boolean(lhs_int->value >= rhs_int->value);
+            }
         case LESS_THAN_EQUAL_TO:
-            return new Boolean(lhs_int->value <= rhs_int->value);
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Boolean(lhs_int->value <= rhs_int->value);
+            }
         case MINUS:
-            return new Integer(lhs_int->value - rhs_int->value);
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Integer(lhs_int->value - rhs_int->value);
+            }
         case PLUS:
-            return new Integer(lhs_int->value + rhs_int->value);
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Integer(lhs_int->value + rhs_int->value);
+            }
         case DIVIDE:
-            return new Integer((int)(lhs_int->value / rhs_int->value));
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Integer((int)(lhs_int->value / rhs_int->value));
+            }
         case MULTIPLY:
-            return new Integer((int)(lhs_int->value * rhs_int->value));
+            if (lhs_int != nullptr && rhs_int != nullptr) {
+                return new Integer((int)(lhs_int->value * rhs_int->value));
+            }
         }
 
         error();

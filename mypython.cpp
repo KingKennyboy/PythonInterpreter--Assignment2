@@ -33,7 +33,10 @@ int main(int argc, char * argv[]) {
         return 1;
     }
 
-    std::string code = openFile(std::string(argv[1]));
+    std::string filename = std::string(argv[1]);
+    //std::string filename = "./testcases/in06.py";
+
+    std::string code = openFile(filename);
     Scanner scan(code);
     Parser parser(scan.getTokens());
     std::vector<Statement*> s = parser.parse();
