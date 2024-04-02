@@ -67,8 +67,13 @@ private:
             checkIndent = false;
             return;
         }
-        if (c == '\n')
-        {
+        if (c == '\r') {
+            return;
+        }
+        if (c == '\t') {
+            return;
+        }
+        if (c == '\n') {
             addToken(NEWLINE);
             checkIndent = true;
             return;
