@@ -1,0 +1,3 @@
+x factorial = 720
+y factorial = 2
+z factorial = 1

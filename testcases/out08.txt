@@ -1,2 +1,1 @@
-resA = 0
-resB = 1
+result = 1
