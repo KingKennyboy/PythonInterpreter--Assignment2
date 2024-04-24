@@ -50,7 +50,7 @@ public:
 class Function : public Statement {
 public:
 	Token name;
-	std::vector<Token> params;
+	std::vector<Token> params; 
 	std::vector<Statement*> body;
 
 	Function(Token name, std::vector<Token> params, std::vector<Statement*> body) {

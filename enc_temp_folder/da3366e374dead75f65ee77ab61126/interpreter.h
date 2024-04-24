@@ -16,7 +16,7 @@ public:
 
     Interpreter(std::vector<Statement*> stmts) {
         this->stmts = stmts;
-        global_env = new Environment();
+        env = new Environment();
     }
 
     void run() {
@@ -34,7 +34,7 @@ public:
     }
 
     Object* visitVarStatement(Var* stmt) {
-        global_env->set(stmt->name.value, stmt->initial->accept(this));
+        env->set(stmt->name.value, stmt->initial->accept(this));
         return nullptr;
     };
     
@@ -51,7 +51,7 @@ public:
     };
     
     Object* visitFunctionStmt(Function* stmt) {
-        global_env->set(stmt->name.value, stmt);
+        env->set(stmt->name.value, stmt);
         return nullptr;
     };
 
@@ -164,7 +164,7 @@ public:
         case NONE:
             return new None();
         case IDENTIFIER:
-            return global_env->get(expr->token.value);
+            return env->get(expr->token.value);
         case NUMBER:
             return new Integer(std::stoi(expr->token.value));
         case STRING:
@@ -217,8 +217,7 @@ public:
     };
 
 private:
-    Environment* global_env;
-    std::stack<Environment*> callstack_env;
+    Environment* env;
     std::stack<int> tempInteger;
 
     void error() {

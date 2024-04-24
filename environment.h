@@ -9,6 +9,7 @@
 class Environment {
 public:
 	std::map<std::string, Object*> data;
+	std::map<std::string, Function*> data_function;
 
 	Environment() {
 		data = {};
@@ -20,5 +21,13 @@ public:
 
 	void set(std::string identifier, Object* value) {
 		data[identifier] = value;
+	}
+
+	void set(std::string identifier, Function* value) {
+		data_function[identifier] = value;
+	}
+
+	Function* get_function(std::string identifier) {
+		return data_function[identifier];
 	}
 };

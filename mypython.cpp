@@ -28,13 +28,13 @@ std::string openFile(std::string filename) {
 
 // Main function
 int main(int argc, char * argv[]) {
-    if (argc != 2) {
-        std::cout << "usage: mypython <file.py>\n";
-        return 1;
-    }
+    //if (argc != 2) {
+    //    std::cout << "usage: mypython <file.py>\n";
+    //    return 1;
+    //}
+    //std::string filename = std::string(argv[1]);
 
-    std::string filename = std::string(argv[1]);
-    //std::string filename = "./testcases/in06.py";
+    std::string filename = "./testcases/custom1.py";
 
     std::string code = openFile(filename);
     Scanner scan(code);

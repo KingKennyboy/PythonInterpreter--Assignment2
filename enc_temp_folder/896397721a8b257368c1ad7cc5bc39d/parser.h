@@ -33,34 +33,16 @@ private:
 	int current = 0;
 
 	Statement* declaration() {
-		if (match(DEF)) {
-			return functionDeclaration();
-		}
+		//if (match(DEF)) {
+		//	return functionDeclaration();
+		//}
 		if (peek().type == IDENTIFIER && peekNext().type == EQUAL) {
 			return varDeclaration();
 		}
 		return statement();
 	}
 
-	Statement* functionDeclaration() {
-		Token name = consume(IDENTIFIER);
-		std::vector<Token> params;
-
-		consume(COLON);
-		consume(NEWLINE);
-		consume(INDENT);
-		std::vector<Statement*> body;
-		body.push_back(declaration());
-		while (!check(DEDENT)) {
-			while (match(NEWLINE)) { ; }
-			if (check(END)) {
-				break;
-			}
-			body.push_back(declaration());
-		}
-		return new Function(name, params, body);
-	}
-
+	//Statement functionDeclaration() {}
 	Statement* varDeclaration() {
 		Token name = consume(IDENTIFIER);
 
