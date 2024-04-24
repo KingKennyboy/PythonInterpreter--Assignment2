@@ -1,2 +1,4 @@
-z = 6
-result = 18
+a = 34
+b = 321
+tmpA = 60
+tmpB = 403
