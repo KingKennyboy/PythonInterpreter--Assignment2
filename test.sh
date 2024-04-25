@@ -13,5 +13,5 @@ for testcase in "./testcases/in"*".py"; do
     fi
 done
 
-# rm -f "$lf_result"
-# rm -f "$lf_output"
+rm -f "$lf_result"
+rm -f "$lf_output"
