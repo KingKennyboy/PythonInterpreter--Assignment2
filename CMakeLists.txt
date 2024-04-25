@@ -13,6 +13,6 @@ endif()
 project (mypython)
 
 # Add source to this project's executable.
-add_executable (mypython "mypython.cpp" "scanner.h"  "parser.h" "token.h" "expression.h" "statement.h" "visitor.h" "interpreter.h" "printer.h" "environment.h" "object.h" "return.h")
+add_executable (mypython "mypython.cpp" "scanner.h"  "parser.h" "token.h" "expression.h" "statement.h" "visitor.h" "interpreter.h" "printer.h" "environment.h" "object.h" "return.h" )
 
 file(COPY testcases/ DESTINATION testcases/)

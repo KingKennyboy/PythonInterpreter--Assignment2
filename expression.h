@@ -56,11 +56,11 @@ public:
 
 class Call : public Expr {
 public:
-	Expr* callee;
+	Token callee;
 	Token paren;
 	std::vector<Expr*> args;
 
-	Call(Expr* callee, Token paren, std::vector<Expr*> args) {
+	Call(Token callee, Token paren, std::vector<Expr*> args) {
 		this->callee = callee;
 		this->paren = paren;
 		this->args = args;

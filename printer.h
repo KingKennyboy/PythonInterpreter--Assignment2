@@ -9,13 +9,9 @@
 
 class Printer : Visitor<void> {
 public:
-    std::vector<Statement*> stmts;
+    Printer() {}
 
-    Printer(std::vector<Statement*> stmts) {
-        this->stmts = stmts;
-    }
-
-    void print() {
+    void print(std::vector<Statement*> stmts) {
         for (size_t i = 0; i < stmts.size(); i++) {
             if (i != 0) {
                 std::cout << "\n";
@@ -29,6 +25,7 @@ public:
         stmt->initial->accept(this);
         std::cout << ")";
     };
+
     void visitBlockStmt(Block* stmt) override {
         std::cout << "(Block, ";
         for (size_t i = 0; i < stmt->statements.size(); i++) {
@@ -39,12 +36,25 @@ public:
         }
         std::cout << ")";
     };
+
     void visitExpressionStmt(Expression* stmt) override {
         std::cout << "(Expression, ";
         stmt->expr->accept(this);
         std::cout << ")";
     };
-    void visitFunctionStmt(Function* stmt) override {};
+
+    void visitFunctionStmt(Function* stmt) override {
+        std::cout << "(Function " << stmt->name.value << ", ";
+        std::cout << "(";
+        for (auto p : stmt->params) {
+            std::cout << p.value << ", ";
+        }
+        std::cout << "), ";
+        std::cout << "\n(\n";
+        print(stmt->body);
+        std::cout << "\n))";
+    };
+
     void visitIfStmt(If* stmt) override {
         std::cout << "(If, ";
         stmt->condition->accept(this);
@@ -80,8 +90,7 @@ public:
     };
     void visitCallExpr(Call* expr) override {
         std::cout << "(";
-        expr->callee->accept(this);
-
+        std::cout << expr->callee.value << ", ";
         std::cout << "(";
 
         bool comma = false;

@@ -9,17 +9,15 @@
 #include "visitor.h"
 #include "statement.h"
 #include "object.h"
+#include "return.h"
 
 class Interpreter: public Visitor<Object*> {
 public:
-    std::vector<Statement*> stmts;
-
-    Interpreter(std::vector<Statement*> stmts) {
-        this->stmts = stmts;
+    Interpreter() {
         global_env = new Environment();
     }
 
-    void run() {
+    void run(std::vector<Statement*> stmts) {
         for (Statement* s : stmts) {
             s->accept(this);
         }
@@ -34,7 +32,12 @@ public:
     }
 
     Object* visitVarStatement(Var* stmt) {
-        global_env->set(stmt->name.value, stmt->initial->accept(this));
+        if (stackframe_env.size() != 0) {
+            stackframe_env.top()->set(stmt->name.value, stmt->initial->accept(this));
+        }
+        else {
+            global_env->set(stmt->name.value, stmt->initial->accept(this));
+        }
         return nullptr;
     };
     
@@ -83,7 +86,8 @@ public:
         return nullptr;
     };
     Object* visitReturnStmt(Return* stmt) {
-        return nullptr;
+        Object* return_obj = evaluate(stmt->value);
+        throw ReturnException(return_obj);
     };
     Object* visitAssignExpr(Assign* expr) {
         return nullptr;
@@ -149,8 +153,16 @@ public:
         return nullptr;
     };
     Object* visitCallExpr(Call* expr) {
-        //data_function[expr->callee]
-        return nullptr;
+        std::string name = expr->callee.value;
+
+        Function* func = global_env->get_function(name);
+
+        std::vector<Object*> args;
+        for (auto a : expr->args) {
+            args.push_back(evaluate(a));
+        }
+
+        return run_function(func, args);
     };
     Object* visitGroupingExpr(Grouping* expr) {
         return evaluate(expr->expression);
@@ -164,6 +176,9 @@ public:
         case NONE:
             return new None();
         case IDENTIFIER:
+            if (stackframe_env.size() != 0 && stackframe_env.top()->exists(expr->token.value)) {
+                return stackframe_env.top()->get(expr->token.value);
+            }
             return global_env->get(expr->token.value);
         case NUMBER:
             return new Integer(std::stoi(expr->token.value));
@@ -216,12 +231,45 @@ public:
         return nullptr;
     };
 
+    void create_stackframe(std::vector<Token> params, std::vector<Object*> args) {
+        stackframe_env.push(new Environment());
+
+        size_t i = 0;
+        while (i < params.size()) {
+            stackframe_env.top()->set(params.at(i).value, args.at(i));
+            i++;
+        }
+    }
+
+    void pop_stackframe() {
+        stackframe_env.pop();
+    }
+
 private:
     Environment* global_env;
-    std::stack<Environment*> callstack_env;
+    std::stack<Environment*> stackframe_env;
     std::stack<int> tempInteger;
+
+    Object* run_function(Function* f, std::vector<Object*> args) {
+        if (args.size() != f->params.size()) {
+            throw std::runtime_error("wrong sized arguments");
+        }
+        try {
+            this->create_stackframe(f->params, args);
+            this->run(f->body);
+        }
+        catch (ReturnException r) {
+            this->pop_stackframe();
+            return r.return_object;
+        }
+
+        this->pop_stackframe();
+        return new None();
+    }
+
 
     void error() {
         throw std::runtime_error("Error interpreter");
     }
 };
+

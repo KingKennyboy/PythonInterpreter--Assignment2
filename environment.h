@@ -15,6 +15,10 @@ public:
 		data = {};
 	}
 
+	bool exists(std::string identifier) {
+		return data.find(identifier) != data.end();
+	}
+
 	Object* get(std::string identifier) {
 		return data[identifier];
 	}

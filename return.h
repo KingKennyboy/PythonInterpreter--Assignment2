@@ -1,20 +1,23 @@
+#pragma once
 
 #include <exception>
 #include "object.h"
 
-class Return : public std::exception {
+class ReturnException : public std::exception {
 public:
 	Object* return_object;
 
 	char* what() {
-		return "Custom Return Exception";
+		char* msg = new char[10];
+		return msg;
 	}
 
-	Return(Object* obj) {
+	ReturnException(Object* obj) {
 		return_object = obj;
 	}
 
-	Return() {
+	ReturnException() {
 		return_object = new None();
 	}
 };
+

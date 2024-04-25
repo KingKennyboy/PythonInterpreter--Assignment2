@@ -45,6 +45,15 @@ private:
 	Statement* functionDeclaration() {
 		Token name = consume(IDENTIFIER);
 		std::vector<Token> params;
+		consume(LPARAN);
+
+		if (!match(RPARAN)) {
+			params.push_back(advance());
+			while (match(COMMA)) {
+				params.push_back(advance());
+			}
+			consume(RPARAN);
+		}
 
 		consume(COLON);
 		consume(NEWLINE);
@@ -53,7 +62,7 @@ private:
 		body.push_back(declaration());
 		while (!check(DEDENT)) {
 			while (match(NEWLINE)) { ; }
-			if (check(END)) {
+			if (check(END) || match(DEDENT)) {
 				break;
 			}
 			body.push_back(declaration());
@@ -199,11 +208,15 @@ private:
 	}
 
 	Expr* call() {
-		Expr* expr = primary();
-		if (check(LPARAN)) {
+		Expr* expr;
+		if (check(IDENTIFIER) && peekNext().type == LPARAN) {
+			Token name = advance();
 			std::vector<Expr*> args = arguments();
 			Token paren = previous();
-			return new Call(expr, paren, args);
+			return new Call(name, paren, args);
+		}
+		else {
+			expr = primary();
 		}
 		return expr;
 	}
