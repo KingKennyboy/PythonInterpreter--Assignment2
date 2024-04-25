@@ -1,6 +1,8 @@
 # COSC 4315 PythonInterpreter w/ Ordonez
 A toy interpreter for the Python language specifications. Includes integer variables, basic expression evaluation, control flow, and functions.
 
+Additionally, the interpreter supports recursion.
+
 To compile run the following in the main directory:
 `g++ -std=c++11 *.cpp -o mypython`
 
