@@ -22,6 +22,9 @@ For parsing, a vector of Tokens were taken in and analyzed. A recursive-descent 
 
 For debugging the parser, a Printer class was created which parses the parse tree using the visitor design pattern. Here, the Printer will output to the command line a representation of each element in the parse tree.
 
+
 For interpreting, an Interpreter class uses the visitor design pattern to visit each Statement/Expression in the parse tree. Each visit will return an Object depending on the Statement/Expression to the next step in the parse tree.
 
 Regarding handling scope in the interpreter, an Environment class was created. This Environment stores variables and functions declared or initialized in a specific scope. The interpreter has two types of environments, global and the callstack. Everytime a function is called, the interpreter creates a callstack Environment and allocates/gets variables prioritizing there before the global scope.
+
+Extra Credit: The C++ interpreter is equipped to handle single and mutual recursion. For technical evaluation, users are encouraged to implement a pair of functions that engage in mutual recursion. This test will assess the interpreter's stack management and its ability to process deeply nested recursive calls, crucial for evaluating the robustness and computational efficiency of the interpreter in handling complex recursive structures.
